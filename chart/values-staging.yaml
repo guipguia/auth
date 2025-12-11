@@ -1,0 +1,76 @@
+# Staging environment values
+replicaCount: 2
+
+image:
+  repository: chassis/auth-service
+  tag: staging
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+
+database:
+  host: postgres-staging
+  port: 5432
+  name: auth_staging
+  user: auth_staging_user
+  password: staging_password_change_me
+  sslmode: require
+  maxOpenConns: 25
+  maxIdleConns: 5
+
+redis:
+  address: redis-staging:6379
+  password: staging_redis_password
+  db: 0
+
+jwt:
+  accessSecret: staging-access-secret-change-me
+  refreshSecret: staging-refresh-secret-change-me
+  accessExpiry: 15m
+  refreshExpiry: 168h
+  issuer: auth-service-staging
+
+encryption:
+  key: staging-encryption-key-32bytes
+
+email:
+  enabled: true
+  from: noreply-staging@chassis.dev
+  smtp:
+    host: smtp.gmail.com
+    port: 587
+    username: staging@chassis.dev
+    password: staging_smtp_password
+    useTLS: true
+
+oauth:
+  google:
+    enabled: true
+    clientId: staging-google-client-id
+    clientSecret: staging-google-client-secret
+    redirectUrl: "https://staging.chassis.dev/auth/callback/google"
+  github:
+    enabled: true
+    clientId: staging-github-client-id
+    clientSecret: staging-github-client-secret
+    redirectUrl: "https://staging.chassis.dev/auth/callback/github"
+
+tenant:
+  serviceUrl: tenant-service:8080
+  timeout: 5s
+
+logging:
+  level: info
+  format: json

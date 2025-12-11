@@ -1,0 +1,134 @@
+# Default values for auth-service
+replicaCount: 2
+
+image:
+  repository: chassis/auth-service
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+
+service:
+  type: ClusterIP
+  port: 8080
+  annotations: {}
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Database configuration
+database:
+  host: postgres
+  port: 5432
+  name: auth_db
+  user: auth_user
+  password: changeme
+  sslmode: disable
+  maxOpenConns: 25
+  maxIdleConns: 5
+  connMaxLifetime: 5m
+
+# Redis configuration
+redis:
+  address: redis:6379
+  password: ""
+  db: 0
+  dialTimeout: 5s
+  readTimeout: 3s
+  writeTimeout: 3s
+  poolSize: 10
+
+# JWT configuration
+jwt:
+  accessSecret: changeme-access-secret
+  refreshSecret: changeme-refresh-secret
+  accessExpiry: 15m
+  refreshExpiry: 168h
+  issuer: auth-service
+
+# Encryption configuration
+encryption:
+  key: changeme-encryption-key-32bytes
+
+# Email/SMTP configuration
+email:
+  enabled: true
+  from: noreply@chassis.dev
+  smtp:
+    host: smtp.gmail.com
+    port: 587
+    username: ""
+    password: ""
+    useTLS: true
+
+# OAuth providers configuration
+oauth:
+  google:
+    enabled: false
+    clientId: ""
+    clientSecret: ""
+    redirectUrl: "https://chassis.dev/auth/callback/google"
+  github:
+    enabled: false
+    clientId: ""
+    clientSecret: ""
+    redirectUrl: "https://chassis.dev/auth/callback/github"
+  microsoft:
+    enabled: false
+    clientId: ""
+    clientSecret: ""
+    redirectUrl: "https://chassis.dev/auth/callback/microsoft"
+
+# Tenant service configuration
+tenant:
+  serviceUrl: tenant-service:8080
+  timeout: 5s
+
+# Server configuration
+server:
+  port: 8080
+  shutdownTimeout: 30s
+
+# Logging configuration
+logging:
+  level: info
+  format: json

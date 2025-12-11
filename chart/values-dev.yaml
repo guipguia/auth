@@ -1,0 +1,58 @@
+# Development environment values
+replicaCount: 1
+
+image:
+  repository: chassis/auth-service
+  tag: dev
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+
+database:
+  host: postgres-dev
+  port: 5432
+  name: auth_dev
+  user: auth_dev_user
+  password: dev_password
+  sslmode: disable
+  maxOpenConns: 10
+  maxIdleConns: 2
+
+redis:
+  address: redis-dev:6379
+  password: ""
+  db: 0
+
+jwt:
+  accessSecret: dev-access-secret
+  refreshSecret: dev-refresh-secret
+  accessExpiry: 30m
+  refreshExpiry: 720h
+  issuer: auth-service-dev
+
+encryption:
+  key: dev-encryption-key-32bytes!!!!!
+
+email:
+  enabled: false
+
+oauth:
+  google:
+    enabled: false
+  github:
+    enabled: false
+  microsoft:
+    enabled: false
+
+logging:
+  level: debug
+  format: json

@@ -1,0 +1,12 @@
+Hello,
+
+Your two-factor authentication code is:
+
+{{ .Code }}
+
+This code will expire in 5 minutes.
+
+If you didn't request this code, please secure your account immediately.
+
+Best regards,
+{{ .AppName }}

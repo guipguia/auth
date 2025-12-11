@@ -1,0 +1,306 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auth-service.fullname" . }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "auth-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "auth-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "auth-service.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: grpc
+          containerPort: {{ .Values.server.port }}
+          protocol: TCP
+        env:
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: server.port
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: logging.level
+        - name: LOG_FORMAT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: logging.format
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.host
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.port
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.name
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.password
+        - name: DB_SSLMODE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.sslmode
+        - name: DB_MAX_OPEN_CONNS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.maxOpenConns
+        - name: DB_MAX_IDLE_CONNS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.maxIdleConns
+        - name: DB_CONN_MAX_LIFETIME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: database.connMaxLifetime
+        - name: REDIS_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.address
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.password
+        - name: REDIS_DB
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.db
+        - name: REDIS_DIAL_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.dialTimeout
+        - name: REDIS_READ_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.readTimeout
+        - name: REDIS_WRITE_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.writeTimeout
+        - name: REDIS_POOL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: redis.poolSize
+        - name: JWT_ACCESS_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: jwt.accessSecret
+        - name: JWT_REFRESH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: jwt.refreshSecret
+        - name: JWT_ACCESS_EXPIRY
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: jwt.accessExpiry
+        - name: JWT_REFRESH_EXPIRY
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: jwt.refreshExpiry
+        - name: JWT_ISSUER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: jwt.issuer
+        - name: ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: encryption.key
+        - name: EMAIL_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.enabled
+        - name: EMAIL_FROM
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.from
+        - name: SMTP_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.smtp.host
+        - name: SMTP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.smtp.port
+        - name: SMTP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.smtp.username
+        - name: SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.smtp.password
+        - name: SMTP_USE_TLS
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: email.smtp.useTLS
+        - name: OAUTH_GOOGLE_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.google.enabled
+        - name: OAUTH_GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.google.clientId
+        - name: OAUTH_GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.google.clientSecret
+        - name: OAUTH_GOOGLE_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.google.redirectUrl
+        - name: OAUTH_GITHUB_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.github.enabled
+        - name: OAUTH_GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.github.clientId
+        - name: OAUTH_GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.github.clientSecret
+        - name: OAUTH_GITHUB_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.github.redirectUrl
+        - name: OAUTH_MICROSOFT_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.microsoft.enabled
+        - name: OAUTH_MICROSOFT_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.microsoft.clientId
+        - name: OAUTH_MICROSOFT_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.microsoft.clientSecret
+        - name: OAUTH_MICROSOFT_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: oauth.microsoft.redirectUrl
+        - name: TENANT_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: tenant.serviceUrl
+        - name: TENANT_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "auth-service.fullname" . }}
+              key: tenant.timeout
+        livenessProbe:
+          tcpSocket:
+            port: grpc
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket:
+            port: grpc
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,94 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+The Auth service has been deployed with the following configuration:
+
+1. Service Information:
+   - Name: {{ include "auth-service.fullname" . }}
+   - Type: {{ .Values.service.type }}
+   - Port: {{ .Values.service.port }}
+   - Replicas: {{ .Values.replicaCount }}
+
+2. Access the service:
+   {{- if eq .Values.service.type "ClusterIP" }}
+   The service is only accessible from within the cluster at:
+   {{ include "auth-service.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+   To test the service from within the cluster:
+   $ kubectl run -it --rm grpcurl --image=fullstorydev/grpcurl --restart=Never -- \
+     {{ include "auth-service.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }} list
+
+   To access from your local machine, you can port-forward:
+   $ kubectl port-forward svc/{{ include "auth-service.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+   {{- else if eq .Values.service.type "LoadBalancer" }}
+   Get the service URL:
+   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+   You can watch the status by running:
+   $ kubectl get svc {{ include "auth-service.fullname" . }} -w
+
+   Once available, get the IP:
+   $ export SERVICE_IP=$(kubectl get svc {{ include "auth-service.fullname" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+   $ echo "Service URL: $SERVICE_IP:{{ .Values.service.port }}"
+   {{- else if eq .Values.service.type "NodePort" }}
+   Get the service URL:
+   $ export NODE_PORT=$(kubectl get svc {{ include "auth-service.fullname" . }} -o jsonpath='{.spec.ports[0].nodePort}')
+   $ export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+   $ echo "Service URL: $NODE_IP:$NODE_PORT"
+   {{- end }}
+
+3. Configuration:
+   {{- if .Values.autoscaling.enabled }}
+   - Autoscaling: ENABLED ({{ .Values.autoscaling.minReplicas }}-{{ .Values.autoscaling.maxReplicas }} replicas)
+   {{- else }}
+   - Autoscaling: DISABLED
+   {{- end }}
+   - Database: {{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
+   - Redis: {{ .Values.redis.address }}
+   - JWT Issuer: {{ .Values.jwt.issuer }}
+   - OAuth Providers:
+     {{- if .Values.oauth.google.enabled }}
+     - Google: ENABLED
+     {{- end }}
+     {{- if .Values.oauth.github.enabled }}
+     - GitHub: ENABLED
+     {{- end }}
+     {{- if .Values.oauth.microsoft.enabled }}
+     - Microsoft: ENABLED
+     {{- end }}
+
+4. Security Reminders:
+   WARNING: Please update the following secrets in production:
+   - Database password (database.password)
+   - JWT access secret (jwt.accessSecret)
+   - JWT refresh secret (jwt.refreshSecret)
+   - Encryption key (encryption.key)
+   - SMTP credentials (email.smtp.username, email.smtp.password)
+   - OAuth client credentials (oauth.*.clientId, oauth.*.clientSecret)
+
+   You can update secrets using:
+   $ helm upgrade {{ .Release.Name }} {{ .Chart.Name }} --set database.password=<new-password> ...
+
+5. Verify deployment:
+   $ kubectl get pods -l app.kubernetes.io/name={{ include "auth-service.name" . }}
+   $ kubectl logs -l app.kubernetes.io/name={{ include "auth-service.name" . }} --tail=50
+
+6. Common operations:
+   # View logs
+   $ kubectl logs -f deployment/{{ include "auth-service.fullname" . }}
+
+   # Scale manually (if autoscaling is disabled)
+   $ kubectl scale deployment/{{ include "auth-service.fullname" . }} --replicas=3
+
+   # Restart deployment
+   $ kubectl rollout restart deployment/{{ include "auth-service.fullname" . }}
+
+   # Check deployment status
+   $ kubectl rollout status deployment/{{ include "auth-service.fullname" . }}
+
+For more information, visit: https://github.com/chassis/auth-service

@@ -1,0 +1,98 @@
+server:
+  address: ":8080"
+  port: 8080
+  app_url: "http://localhost:3000"  # Base URL for your frontend application (used in email links)
+
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  dbname: auth_db
+  sslmode: disable
+  max_conns: 25
+  max_idle: 5
+
+jwt:
+  access_token_secret: your-super-secret-access-token-key-change-this
+  refresh_token_secret: your-super-secret-refresh-token-key-change-this
+  access_token_expiry: 15m
+  refresh_token_expiry: 168h # 7 days
+  issuer: auth-service
+
+oauth:
+  google:
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8080/auth/google/callback
+    scopes:
+      - openid
+      - email
+      - profile
+  github:
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8080/auth/github/callback
+    scopes:
+      - user:email
+  facebook:
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8080/auth/facebook/callback
+    scopes:
+      - email
+      - public_profile
+  apple:
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8080/auth/apple/callback
+    scopes:
+      - email
+      - name
+  microsoft:
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8080/auth/microsoft/callback
+    scopes:
+      - openid
+      - email
+      - profile
+  discord:
+    client_id: ""
+    client_secret: ""
+    redirect_url: http://localhost:8080/auth/discord/callback
+    scopes:
+      - identify
+      - email
+
+email:
+  # Options: smtp, sendgrid, ses
+  provider: smtp
+  from_email: noreply@example.com
+  from_name: Auth Service
+
+  # For SMTP provider
+  smtp_host: ""
+  smtp_port: 587
+  smtp_user: ""
+  smtp_pass: ""
+
+  # For SendGrid or SES provider (use api_key)
+  api_key: ""
+
+# Cache Configuration (for stateless horizontal scaling)
+cache:
+  # Options: none (stateless), memory (single instance only), redis (Valkey/Redis for horizontal scaling)
+  type: none
+  enabled: false
+  ttl_seconds: 300      # Default TTL for cached items (5 minutes)
+  max_size: 10000       # Max entries for memory cache
+  cleanup_minutes: 10   # Cleanup interval for memory cache
+
+  # Redis/Valkey configuration (when type: redis)
+  # Valkey is an open-source Redis alternative (BSD-3 license)
+  redis:
+    address: localhost:6379
+    password: ""
+    db: 0
+    ttl_seconds: 300

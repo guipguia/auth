@@ -1,0 +1,13 @@
+Hello,
+
+You've been invited to join a team on {{ .AppName }} as a {{ .Role }}.
+
+Click the link below to accept your invitation:
+{{ .InviteURL }}
+
+This invitation link will expire in 7 days.
+
+If you did not expect this invitation, you can safely ignore this email.
+
+Best regards,
+{{ .AppName }}

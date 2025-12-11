@@ -1,0 +1,12 @@
+Hello,
+
+Thank you for registering! Please verify your email address by clicking the link below:
+
+{{ .VerificationURL }}
+
+This link will expire in 24 hours.
+
+If you didn't create an account, you can safely ignore this email.
+
+Best regards,
+{{ .AppName }}

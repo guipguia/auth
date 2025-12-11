@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: auth-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Valkey for distributed caching (enables stateless horizontal scaling)
+  valkey:
+    image: valkey/valkey:9.0.0-alpine3.22
+    container_name: auth-valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build: .
+    container_name: auth_service
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      - AUTH_DATABASE_HOST=postgres
+      - AUTH_DATABASE_PORT=5432
+      - AUTH_DATABASE_USER=postgres
+      - AUTH_DATABASE_PASSWORD=postgres
+      - AUTH_DATABASE_DBNAME=auth_db
+      - AUTH_DATABASE_SSLMODE=disable
+      # Cache configuration (Valkey for horizontal scaling)
+      - AUTH_CACHE_TYPE=redis
+      - AUTH_CACHE_ENABLED=true
+      - AUTH_CACHE_TTL_SECONDS=300
+      - AUTH_CACHE_REDIS_ADDRESS=valkey:6379
+      # Email configuration
+      - AUTH_EMAIL_API_KEY=<REPLACE_ME>
+      - AUTH_EMAIL_PROVIDER=sendgrid
+      - AUTH_EMAIL_FROM_EMAIL=<REPLACE_ME>
+      - AUTH_EMAIL_FROM_NAME=<REPLACE_ME>
+      - AUTH_SERVER_APP_URL=https://<REPLACE_ME>
+      # JWT secrets
+      - AUTH_JWT_ACCESS_TOKEN_SECRET=${AUTH_JWT_ACCESS_TOKEN_SECRET:-change-this-secret-key-for-access-tokens}
+      - AUTH_JWT_REFRESH_TOKEN_SECRET=${AUTH_JWT_REFRESH_TOKEN_SECRET:-change-this-secret-key-for-refresh-tokens}
+    restart: unless-stopped
+    # For horizontal scaling (uncomment and adjust replica count)
+    # deploy:
+    #   replicas: 3
+
+volumes:
+  postgres_data:
+  valkey_data:

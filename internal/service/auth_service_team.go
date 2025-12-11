@@ -57,11 +57,8 @@ func (s *TeamAuthService) Register(ctx context.Context, req *authv1.RegisterRequ
 	// Check if this is the first user in the tenant (they become owner)
 	members, total, _ := s.membershipService.ListMembers(ctx, tenantID, 1, 0)
 	if total == 0 || len(members) == 0 {
-		// First user becomes owner
-		if err := s.membershipService.CreateOwnerMembership(ctx, tenantID, userID); err != nil {
-			// Log error but don't fail registration
-			// The user is registered, just without ownership
-		}
+		// First user becomes owner - ignore error as registration already succeeded
+		_ = s.membershipService.CreateOwnerMembership(ctx, tenantID, userID)
 	}
 
 	return resp, nil
@@ -135,7 +132,7 @@ func (s *TeamAuthService) InviteTeamMember(ctx context.Context, req *authv1.Invi
 		return nil, fmt.Errorf("failed to invite user: %w", err)
 	}
 
-	message := "Invitation created."
+	var message string
 	if result.EmailSent {
 		message = "Invitation sent successfully."
 	} else {

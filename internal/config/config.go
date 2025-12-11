@@ -253,98 +253,98 @@ func Load() (*Config, error) {
 // bindEnvVariables explicitly binds all config keys to environment variables
 func bindEnvVariables(v *viper.Viper) {
 	// Server
-	v.BindEnv("server.address")
-	v.BindEnv("server.port")
-	v.BindEnv("server.app_url")
+	_ = v.BindEnv("server.address")
+	_ = v.BindEnv("server.port")
+	_ = v.BindEnv("server.app_url")
 
 	// Database
-	v.BindEnv("database.host")
-	v.BindEnv("database.port")
-	v.BindEnv("database.user")
-	v.BindEnv("database.password")
-	v.BindEnv("database.dbname")
-	v.BindEnv("database.sslmode")
-	v.BindEnv("database.max_conns")
-	v.BindEnv("database.max_idle")
+	_ = v.BindEnv("database.host")
+	_ = v.BindEnv("database.port")
+	_ = v.BindEnv("database.user")
+	_ = v.BindEnv("database.password")
+	_ = v.BindEnv("database.dbname")
+	_ = v.BindEnv("database.sslmode")
+	_ = v.BindEnv("database.max_conns")
+	_ = v.BindEnv("database.max_idle")
 
 	// JWT
-	v.BindEnv("jwt.access_token_secret")
-	v.BindEnv("jwt.refresh_token_secret")
-	v.BindEnv("jwt.access_token_expiry")
-	v.BindEnv("jwt.refresh_token_expiry")
-	v.BindEnv("jwt.issuer")
+	_ = v.BindEnv("jwt.access_token_secret")
+	_ = v.BindEnv("jwt.refresh_token_secret")
+	_ = v.BindEnv("jwt.access_token_expiry")
+	_ = v.BindEnv("jwt.refresh_token_expiry")
+	_ = v.BindEnv("jwt.issuer")
 
 	// OAuth - Google
-	v.BindEnv("oauth.google.client_id")
-	v.BindEnv("oauth.google.client_secret")
-	v.BindEnv("oauth.google.redirect_url")
-	v.BindEnv("oauth.google.scopes")
+	_ = v.BindEnv("oauth.google.client_id")
+	_ = v.BindEnv("oauth.google.client_secret")
+	_ = v.BindEnv("oauth.google.redirect_url")
+	_ = v.BindEnv("oauth.google.scopes")
 
 	// OAuth - GitHub
-	v.BindEnv("oauth.github.client_id")
-	v.BindEnv("oauth.github.client_secret")
-	v.BindEnv("oauth.github.redirect_url")
-	v.BindEnv("oauth.github.scopes")
+	_ = v.BindEnv("oauth.github.client_id")
+	_ = v.BindEnv("oauth.github.client_secret")
+	_ = v.BindEnv("oauth.github.redirect_url")
+	_ = v.BindEnv("oauth.github.scopes")
 
 	// OAuth - Facebook
-	v.BindEnv("oauth.facebook.client_id")
-	v.BindEnv("oauth.facebook.client_secret")
-	v.BindEnv("oauth.facebook.redirect_url")
-	v.BindEnv("oauth.facebook.scopes")
+	_ = v.BindEnv("oauth.facebook.client_id")
+	_ = v.BindEnv("oauth.facebook.client_secret")
+	_ = v.BindEnv("oauth.facebook.redirect_url")
+	_ = v.BindEnv("oauth.facebook.scopes")
 
 	// OAuth - Apple
-	v.BindEnv("oauth.apple.client_id")
-	v.BindEnv("oauth.apple.client_secret")
-	v.BindEnv("oauth.apple.redirect_url")
-	v.BindEnv("oauth.apple.scopes")
+	_ = v.BindEnv("oauth.apple.client_id")
+	_ = v.BindEnv("oauth.apple.client_secret")
+	_ = v.BindEnv("oauth.apple.redirect_url")
+	_ = v.BindEnv("oauth.apple.scopes")
 
 	// OAuth - Microsoft
-	v.BindEnv("oauth.microsoft.client_id")
-	v.BindEnv("oauth.microsoft.client_secret")
-	v.BindEnv("oauth.microsoft.redirect_url")
-	v.BindEnv("oauth.microsoft.scopes")
+	_ = v.BindEnv("oauth.microsoft.client_id")
+	_ = v.BindEnv("oauth.microsoft.client_secret")
+	_ = v.BindEnv("oauth.microsoft.redirect_url")
+	_ = v.BindEnv("oauth.microsoft.scopes")
 
 	// OAuth - Discord
-	v.BindEnv("oauth.discord.client_id")
-	v.BindEnv("oauth.discord.client_secret")
-	v.BindEnv("oauth.discord.redirect_url")
-	v.BindEnv("oauth.discord.scopes")
+	_ = v.BindEnv("oauth.discord.client_id")
+	_ = v.BindEnv("oauth.discord.client_secret")
+	_ = v.BindEnv("oauth.discord.redirect_url")
+	_ = v.BindEnv("oauth.discord.scopes")
 
 	// Email
-	v.BindEnv("email.provider")
-	v.BindEnv("email.smtp_host")
-	v.BindEnv("email.smtp_port")
-	v.BindEnv("email.smtp_user")
-	v.BindEnv("email.smtp_pass")
-	v.BindEnv("email.from_email")
-	v.BindEnv("email.from_name")
-	v.BindEnv("email.api_key")
+	_ = v.BindEnv("email.provider")
+	_ = v.BindEnv("email.smtp_host")
+	_ = v.BindEnv("email.smtp_port")
+	_ = v.BindEnv("email.smtp_user")
+	_ = v.BindEnv("email.smtp_pass")
+	_ = v.BindEnv("email.from_email")
+	_ = v.BindEnv("email.from_name")
+	_ = v.BindEnv("email.api_key")
 
 	// Cache
-	v.BindEnv("cache.type")
-	v.BindEnv("cache.enabled")
-	v.BindEnv("cache.ttl_seconds")
-	v.BindEnv("cache.max_size")
-	v.BindEnv("cache.cleanup_minutes")
+	_ = v.BindEnv("cache.type")
+	_ = v.BindEnv("cache.enabled")
+	_ = v.BindEnv("cache.ttl_seconds")
+	_ = v.BindEnv("cache.max_size")
+	_ = v.BindEnv("cache.cleanup_minutes")
 
 	// Redis/Valkey Cache
-	v.BindEnv("cache.redis.address")
-	v.BindEnv("cache.redis.password")
-	v.BindEnv("cache.redis.db")
-	v.BindEnv("cache.redis.ttl_seconds")
+	_ = v.BindEnv("cache.redis.address")
+	_ = v.BindEnv("cache.redis.password")
+	_ = v.BindEnv("cache.redis.db")
+	_ = v.BindEnv("cache.redis.ttl_seconds")
 
 	// Session
-	v.BindEnv("session.session_expiry")
-	v.BindEnv("session.idle_timeout")
-	v.BindEnv("session.max_concurrent_sessions")
-	v.BindEnv("session.hipaa_compliant")
+	_ = v.BindEnv("session.session_expiry")
+	_ = v.BindEnv("session.idle_timeout")
+	_ = v.BindEnv("session.max_concurrent_sessions")
+	_ = v.BindEnv("session.hipaa_compliant")
 
 	// Tenant service
-	v.BindEnv("tenant.address")
-	v.BindEnv("tenant.timeout")
+	_ = v.BindEnv("tenant.address")
+	_ = v.BindEnv("tenant.timeout")
 
 	// Encryption
-	v.BindEnv("encryption_key")
+	_ = v.BindEnv("encryption_key")
 }
 
 // setDefaults sets default configuration values

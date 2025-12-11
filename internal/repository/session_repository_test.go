@@ -143,8 +143,8 @@ func TestSessionRepository_GetActiveSessions(t *testing.T) {
 		RefreshToken: "token-2",
 		ExpiresAt:    time.Now().Add(7 * 24 * time.Hour),
 	}
-	repo.Create(session1)
-	repo.Create(session2)
+	_ = repo.Create(session1)
+	_ = repo.Create(session2)
 
 	// Create expired session
 	expiredSession := &domain.Session{
@@ -153,7 +153,7 @@ func TestSessionRepository_GetActiveSessions(t *testing.T) {
 		RefreshToken: "token-expired",
 		ExpiresAt:    time.Now().Add(-1 * time.Hour),
 	}
-	repo.Create(expiredSession)
+	_ = repo.Create(expiredSession)
 
 	// Create revoked session
 	revokedSession := &domain.Session{
@@ -163,7 +163,7 @@ func TestSessionRepository_GetActiveSessions(t *testing.T) {
 		ExpiresAt:    time.Now().Add(7 * 24 * time.Hour),
 		RevokedAt:    func() *time.Time { t := time.Now(); return &t }(),
 	}
-	repo.Create(revokedSession)
+	_ = repo.Create(revokedSession)
 
 	sessions, err := repo.GetActiveSessions(tenantID, user.ID)
 
@@ -236,8 +236,8 @@ func TestSessionRepository_RevokeAllUserSessions(t *testing.T) {
 		RefreshToken: "token-2",
 		ExpiresAt:    time.Now().Add(7 * 24 * time.Hour),
 	}
-	repo.Create(session1)
-	repo.Create(session2)
+	_ = repo.Create(session1)
+	_ = repo.Create(session2)
 
 	err := repo.RevokeAllUserSessions(tenantID, user.ID)
 
@@ -260,7 +260,7 @@ func TestSessionRepository_DeleteExpired(t *testing.T) {
 		RefreshToken: "expired-token",
 		ExpiresAt:    time.Now().Add(-7 * 24 * time.Hour),
 	}
-	repo.Create(expiredSession)
+	_ = repo.Create(expiredSession)
 
 	// Create active session
 	activeSession := &domain.Session{
@@ -269,7 +269,7 @@ func TestSessionRepository_DeleteExpired(t *testing.T) {
 		RefreshToken: "active-token",
 		ExpiresAt:    time.Now().Add(7 * 24 * time.Hour),
 	}
-	repo.Create(activeSession)
+	_ = repo.Create(activeSession)
 
 	err := repo.DeleteExpired()
 

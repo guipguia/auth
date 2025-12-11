@@ -42,7 +42,7 @@ func main() {
 	if err != nil {
 		logging.Logger.Fatal("Failed to initialize database", zap.Error(err))
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// Run migrations
 	if err := db.AutoMigrate(); err != nil {
@@ -61,7 +61,7 @@ func main() {
 	if err != nil {
 		logging.Logger.Fatal("Failed to initialize cache service", zap.Error(err))
 	}
-	defer cacheService.Close()
+	defer func() { _ = cacheService.Close() }()
 
 	if cfg.Cache.Enabled {
 		logging.Logger.Info("Cache service initialized", zap.String("type", cfg.Cache.Type))

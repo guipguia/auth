@@ -104,7 +104,7 @@ func (s *AuthService) Register(ctx context.Context, req *authv1.RegisterRequest)
 	// Validate password strength
 	if err := s.passwordService.ValidatePasswordStrength(req.Password); err != nil {
 		// Audit log failed registration attempt
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionRegister, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionRegister, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "password_validation_failed",
 			"email":  req.Email,
 		})
@@ -115,7 +115,7 @@ func (s *AuthService) Register(ctx context.Context, req *authv1.RegisterRequest)
 	existingUser, _ := s.userRepo.GetByEmail(tenantID, req.Email)
 	if existingUser != nil {
 		// Audit log failed registration attempt
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionRegister, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionRegister, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "user_already_exists",
 			"email":  req.Email,
 		})
@@ -160,7 +160,7 @@ func (s *AuthService) Register(ctx context.Context, req *authv1.RegisterRequest)
 	}
 
 	// Audit log successful registration
-	s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionRegister, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionRegister, domain.AuditStatusSuccess, map[string]interface{}{
 		"email": user.Email,
 	})
 
@@ -184,7 +184,7 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 
 	// Check if login is allowed (brute force protection)
 	if err := s.loginProtectionService.CheckLoginAllowed(ctx, tenantID, req.Email, ipAddress); err != nil {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionLogin, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionLogin, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "rate_limited",
 			"email":  req.Email,
 		})
@@ -195,8 +195,8 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 	user, err := s.userRepo.GetByEmail(tenantID, req.Email)
 	if err != nil {
 		// Record failed login attempt
-		s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, nil, false, "user_not_found")
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionLogin, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, nil, false, "user_not_found")
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionLogin, domain.AuditResourceUser, req.Email, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_credentials",
 			"email":  req.Email,
 		})
@@ -205,8 +205,8 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 
 	// Check if account is locked
 	if user.LockedUntil != nil && user.LockedUntil.After(time.Now()) {
-		s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, false, "account_locked")
-		s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, false, "account_locked")
+		_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
 			"reason":       "account_locked",
 			"locked_until": user.LockedUntil,
 		})
@@ -216,8 +216,8 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 	// Verify password
 	if err := s.passwordService.VerifyPassword(user.PasswordHash, req.Password); err != nil {
 		// Record failed login attempt
-		s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, false, "invalid_password")
-		s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, false, "invalid_password")
+		_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_password",
 		})
 		return nil, fmt.Errorf("invalid credentials")
@@ -238,8 +238,8 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 		if !s.totpService.ValidateCode(user.TwoFactorSecret, req.TotpCode) {
 			// Check backup codes
 			if err := s.userRepo.UseBackupCode(tenantID, user.ID, req.TotpCode); err != nil {
-				s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, false, "invalid_2fa_code")
-				s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
+				_ = s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, false, "invalid_2fa_code")
+				_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
 					"reason": "invalid_2fa_code",
 				})
 				return nil, fmt.Errorf("invalid 2FA code")
@@ -249,7 +249,7 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 
 	// Check if user must change password
 	if user.MustChangePassword {
-		s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "password_change_required",
 		})
 		return nil, fmt.Errorf("password change required before proceeding")
@@ -262,7 +262,7 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 			// Revoke oldest session to make room
 			sessions, _ := s.sessionRepo.GetActiveSessions(tenantID, user.ID)
 			if len(sessions) > 0 {
-				s.sessionRepo.Revoke(tenantID, sessions[len(sessions)-1].ID)
+				_ = s.sessionRepo.Revoke(tenantID, sessions[len(sessions)-1].ID)
 			}
 		}
 	}
@@ -306,10 +306,10 @@ func (s *AuthService) Login(ctx context.Context, req *authv1.LoginRequest) (*aut
 	if err := s.userRepo.UpdateLastLogin(tenantID, user.ID); err != nil {
 		s.logger.Error("Failed to update last login", "error", err, "user_id", user.ID, "tenant_id", tenantID)
 	}
-	s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, true, "")
+	_ = s.loginProtectionService.RecordLoginAttempt(ctx, tenantID, req.Email, ipAddress, &user.ID, true, "")
 
 	// Audit log successful login
-	s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionLogin, domain.AuditStatusSuccess, map[string]interface{}{
 		"session_id": session.ID.String(),
 		"device_id":  req.DeviceId,
 	})
@@ -344,7 +344,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, req *authv1.RefreshToken
 
 	// Check if session is active
 	if !session.IsActive() {
-		s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRefresh, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRefresh, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "session_expired_or_revoked",
 		})
 		return nil, fmt.Errorf("session expired or revoked")
@@ -353,8 +353,8 @@ func (s *AuthService) RefreshToken(ctx context.Context, req *authv1.RefreshToken
 	// Check idle timeout only when HIPAA compliance mode is enabled
 	if s.sessionConfig.HIPAACompliant && session.IdleTimeoutAt != nil && session.IdleTimeoutAt.Before(time.Now()) {
 		// Session has timed out due to inactivity
-		s.sessionRepo.Revoke(tenantID, session.ID)
-		s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRefresh, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.sessionRepo.Revoke(tenantID, session.ID)
+		_ = s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRefresh, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "idle_timeout",
 		})
 		return nil, fmt.Errorf("session timed out due to inactivity")
@@ -393,7 +393,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, req *authv1.RefreshToken
 	}
 
 	// Audit log token refresh
-	s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRefresh, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRefresh, domain.AuditStatusSuccess, nil)
 
 	return &authv1.RefreshTokenResponse{
 		AccessToken:  accessToken,
@@ -424,7 +424,7 @@ func (s *AuthService) Logout(ctx context.Context, req *authv1.LogoutRequest) (*a
 
 	// Audit log logout
 	if session != nil {
-		s.auditService.LogUserAction(ctx, tenantID, session.UserID, nil, domain.AuditActionLogout, domain.AuditStatusSuccess, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, session.UserID, nil, domain.AuditActionLogout, domain.AuditStatusSuccess, map[string]interface{}{
 			"session_id": sessionID.String(),
 		})
 	}
@@ -456,7 +456,7 @@ func (s *AuthService) ChangePassword(ctx context.Context, req *authv1.ChangePass
 
 	// Verify current password
 	if err := s.passwordService.VerifyPassword(user.PasswordHash, req.CurrentPassword); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_current_password",
 		})
 		return nil, fmt.Errorf("invalid current password")
@@ -464,7 +464,7 @@ func (s *AuthService) ChangePassword(ctx context.Context, req *authv1.ChangePass
 
 	// Validate new password strength
 	if err := s.passwordService.ValidatePasswordStrength(req.NewPassword); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "password_validation_failed",
 		})
 		return nil, fmt.Errorf("password validation failed: %w", err)
@@ -472,7 +472,7 @@ func (s *AuthService) ChangePassword(ctx context.Context, req *authv1.ChangePass
 
 	// Check password history for compliance (prevent reuse)
 	if err := s.passwordHistoryService.CheckPasswordReuse(ctx, tenantID, userID, req.NewPassword); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "password_reuse_detected",
 		})
 		return nil, err
@@ -500,7 +500,7 @@ func (s *AuthService) ChangePassword(ctx context.Context, req *authv1.ChangePass
 	}
 
 	// Audit log successful password change
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionPasswordChange, domain.AuditStatusSuccess, nil)
 
 	return &authv1.ChangePasswordResponse{
 		Success: true,
@@ -520,7 +520,7 @@ func (s *AuthService) ForgotPassword(ctx context.Context, req *authv1.ForgotPass
 	user, err := s.userRepo.GetByEmail(tenantID, req.Email)
 	if err != nil {
 		// Audit log the attempt (but don't reveal if user exists)
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionPasswordResetRequest, domain.AuditResourceUser, req.Email, domain.AuditStatusSuccess, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionPasswordResetRequest, domain.AuditResourceUser, req.Email, domain.AuditStatusSuccess, map[string]interface{}{
 			"email":      req.Email,
 			"user_found": false,
 		})
@@ -543,7 +543,7 @@ func (s *AuthService) ForgotPassword(ctx context.Context, req *authv1.ForgotPass
 	}
 
 	// Audit log password reset request
-	s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionPasswordResetRequest, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionPasswordResetRequest, domain.AuditStatusSuccess, nil)
 
 	return &authv1.ForgotPasswordResponse{
 		Success: true,
@@ -571,7 +571,7 @@ func (s *AuthService) ResetPassword(ctx context.Context, req *authv1.ResetPasswo
 
 	// Validate new password strength
 	if err := s.passwordService.ValidatePasswordStrength(req.NewPassword); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionPasswordReset, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionPasswordReset, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "password_validation_failed",
 		})
 		return nil, fmt.Errorf("password validation failed: %w", err)
@@ -579,7 +579,7 @@ func (s *AuthService) ResetPassword(ctx context.Context, req *authv1.ResetPasswo
 
 	// Check password history for compliance (prevent reuse)
 	if err := s.passwordHistoryService.CheckPasswordReuse(ctx, tenantID, otp.UserID, req.NewPassword); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionPasswordReset, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionPasswordReset, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "password_reuse_detected",
 		})
 		return nil, err
@@ -612,7 +612,7 @@ func (s *AuthService) ResetPassword(ctx context.Context, req *authv1.ResetPasswo
 	}
 
 	// Audit log successful password reset
-	s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionPasswordReset, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionPasswordReset, domain.AuditStatusSuccess, nil)
 
 	return &authv1.ResetPasswordResponse{
 		Success: true,
@@ -662,7 +662,7 @@ func (s *AuthService) Enable2FA(ctx context.Context, req *authv1.Enable2FAReques
 	}
 
 	// Audit log 2FA enabled
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFAEnable, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFAEnable, domain.AuditStatusSuccess, nil)
 
 	return &authv1.Enable2FAResponse{
 		Secret:      secret,
@@ -692,14 +692,14 @@ func (s *AuthService) Verify2FA(ctx context.Context, req *authv1.Verify2FAReques
 
 	// Verify TOTP code
 	if !s.totpService.ValidateCode(user.TwoFactorSecret, req.TotpCode) {
-		s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFAVerify, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFAVerify, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_code",
 		})
 		return nil, fmt.Errorf("invalid 2FA code")
 	}
 
 	// Audit log 2FA verification
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFAVerify, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFAVerify, domain.AuditStatusSuccess, nil)
 
 	// If this is completing a login flow, generate tokens
 	if req.SessionId != "" {
@@ -751,7 +751,7 @@ func (s *AuthService) Disable2FA(ctx context.Context, req *authv1.Disable2FARequ
 
 	// Verify password
 	if err := s.passwordService.VerifyPassword(user.PasswordHash, req.Password); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFADisable, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFADisable, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_password",
 		})
 		return nil, fmt.Errorf("invalid password")
@@ -759,7 +759,7 @@ func (s *AuthService) Disable2FA(ctx context.Context, req *authv1.Disable2FARequ
 
 	// Verify TOTP code
 	if !s.totpService.ValidateCode(user.TwoFactorSecret, req.TotpCode) {
-		s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFADisable, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFADisable, domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_2fa_code",
 		})
 		return nil, fmt.Errorf("invalid 2FA code")
@@ -771,7 +771,7 @@ func (s *AuthService) Disable2FA(ctx context.Context, req *authv1.Disable2FARequ
 	}
 
 	// Audit log 2FA disabled
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFADisable, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFADisable, domain.AuditStatusSuccess, nil)
 
 	return &authv1.Disable2FAResponse{
 		Success: true,
@@ -815,7 +815,7 @@ func (s *AuthService) Generate2FABackupCodes(ctx context.Context, req *authv1.Ge
 	}
 
 	// Audit log backup codes regenerated
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFABackupGenerate, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionMFABackupGenerate, domain.AuditStatusSuccess, nil)
 
 	return &authv1.Generate2FABackupCodesResponse{
 		BackupCodes: backupCodes,
@@ -842,7 +842,7 @@ func (s *AuthService) SendPasswordlessEmail(ctx context.Context, req *authv1.Sen
 	}
 
 	// Audit log passwordless request
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionPasswordlessSend, domain.AuditResourceUser, req.Email, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionPasswordlessSend, domain.AuditResourceUser, req.Email, domain.AuditStatusSuccess, nil)
 
 	return &authv1.SendPasswordlessEmailResponse{
 		Success:   true,
@@ -864,7 +864,7 @@ func (s *AuthService) VerifyPasswordlessToken(ctx context.Context, req *authv1.V
 	// Verify token
 	otp, err := s.passwordlessService.VerifyToken(tenantID, req.Token)
 	if err != nil {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionPasswordlessVerify, domain.AuditResourceUser, "", domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionPasswordlessVerify, domain.AuditResourceUser, "", domain.AuditStatusFailure, map[string]interface{}{
 			"reason": "invalid_token",
 		})
 		return nil, fmt.Errorf("invalid or expired token: %w", err)
@@ -884,7 +884,7 @@ func (s *AuthService) VerifyPasswordlessToken(ctx context.Context, req *authv1.V
 		}
 
 		// Audit log new user registration via passwordless
-		s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionRegister, domain.AuditStatusSuccess, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionRegister, domain.AuditStatusSuccess, map[string]interface{}{
 			"method": "passwordless",
 		})
 	}
@@ -930,7 +930,7 @@ func (s *AuthService) VerifyPasswordlessToken(ctx context.Context, req *authv1.V
 	}
 
 	// Audit log passwordless login
-	s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionPasswordlessVerify, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionPasswordlessVerify, domain.AuditStatusSuccess, map[string]interface{}{
 		"session_id": session.ID.String(),
 	})
 
@@ -1041,7 +1041,7 @@ func (s *AuthService) RevokeAllSessions(ctx context.Context, req *authv1.RevokeA
 	}
 
 	// Audit log
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionSessionRevoke, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionSessionRevoke, domain.AuditStatusSuccess, map[string]interface{}{
 		"revoked_count":  revokedCount,
 		"except_current": req.ExceptCurrent,
 	})
@@ -1107,14 +1107,14 @@ func (s *AuthService) UnlockAccount(ctx context.Context, req *authv1.UnlockAccou
 
 	// Unlock the account
 	if err := s.loginProtectionService.UnlockAccount(ctx, tenantID, userID, actorID); err != nil {
-		s.auditService.LogUserAction(ctx, tenantID, userID, actorID, domain.AuditActionAccountUnlock, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, userID, actorID, domain.AuditActionAccountUnlock, domain.AuditStatusFailure, map[string]interface{}{
 			"error": err.Error(),
 		})
 		return nil, fmt.Errorf("failed to unlock account: %w", err)
 	}
 
 	// Audit log
-	s.auditService.LogUserAction(ctx, tenantID, userID, actorID, domain.AuditActionAccountUnlock, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, actorID, domain.AuditActionAccountUnlock, domain.AuditStatusSuccess, nil)
 
 	return &authv1.UnlockAccountResponse{
 		Success: true,

@@ -196,7 +196,7 @@ func (s *oauthService) getGoogleUserInfo(token *oauth2.Token) (*OAuthUserInfo, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -236,7 +236,7 @@ func (s *oauthService) getGitHubUserInfo(token *oauth2.Token) (*OAuthUserInfo, e
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -279,7 +279,7 @@ func (s *oauthService) getGitHubEmail(token *oauth2.Token) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -314,7 +314,7 @@ func (s *oauthService) getFacebookUserInfo(token *oauth2.Token) (*OAuthUserInfo,
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -449,7 +449,7 @@ func (s *oauthService) getMicrosoftUserInfo(token *oauth2.Token) (*OAuthUserInfo
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -495,7 +495,7 @@ func (s *oauthService) getDiscordUserInfo(token *oauth2.Token) (*OAuthUserInfo, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user info: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {

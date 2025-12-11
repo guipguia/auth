@@ -81,7 +81,7 @@ func (s *membershipService) CreateOwnerMembership(ctx context.Context, tenantID,
 		return fmt.Errorf("failed to create owner membership: %w", err)
 	}
 
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberAdd, domain.AuditResourceMembership, userID.String(), domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberAdd, domain.AuditResourceMembership, userID.String(), domain.AuditStatusSuccess, map[string]interface{}{
 		"role":    string(domain.RoleOwner),
 		"user_id": userID.String(),
 	})
@@ -115,7 +115,7 @@ func (s *membershipService) UpdateMemberRole(ctx context.Context, tenantID, acto
 
 	// Only owners can change roles
 	if !actorMembership.CanChangeRole() {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRoleChange, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRoleChange, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusFailure, map[string]interface{}{
 			"reason":   "permission_denied",
 			"actor_id": actorID.String(),
 		})
@@ -143,7 +143,7 @@ func (s *membershipService) UpdateMemberRole(ctx context.Context, tenantID, acto
 		return fmt.Errorf("failed to update role: %w", err)
 	}
 
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRoleChange, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRoleChange, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusSuccess, map[string]interface{}{
 		"old_role":       string(oldRole),
 		"new_role":       string(newRole),
 		"actor_id":       actorID.String(),
@@ -163,7 +163,7 @@ func (s *membershipService) RemoveMember(ctx context.Context, tenantID, actorID,
 
 	// Admins and owners can remove members
 	if !actorMembership.CanManageMembers() {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRemove, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRemove, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusFailure, map[string]interface{}{
 			"reason":   "permission_denied",
 			"actor_id": actorID.String(),
 		})
@@ -190,7 +190,7 @@ func (s *membershipService) RemoveMember(ctx context.Context, tenantID, actorID,
 		return fmt.Errorf("failed to remove member: %w", err)
 	}
 
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRemove, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberRemove, domain.AuditResourceMembership, targetUserID.String(), domain.AuditStatusSuccess, map[string]interface{}{
 		"actor_id":       actorID.String(),
 		"target_user_id": targetUserID.String(),
 		"removed_role":   string(targetMembership.Role),
@@ -209,7 +209,7 @@ func (s *membershipService) InviteUser(ctx context.Context, tenantID, inviterID 
 
 	// Only admins and owners can invite
 	if !inviterMembership.CanManageMembers() {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberInvite, domain.AuditResourceInvitation, email, domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberInvite, domain.AuditResourceInvitation, email, domain.AuditStatusFailure, map[string]interface{}{
 			"reason":     "permission_denied",
 			"inviter_id": inviterID.String(),
 		})
@@ -265,7 +265,7 @@ func (s *membershipService) InviteUser(ctx context.Context, tenantID, inviterID 
 		emailSent = true
 	}
 
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberInvite, domain.AuditResourceInvitation, invitation.ID.String(), domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionMemberInvite, domain.AuditResourceInvitation, invitation.ID.String(), domain.AuditStatusSuccess, map[string]interface{}{
 		"inviter_id": inviterID.String(),
 		"email":      email,
 		"role":       string(role),
@@ -334,7 +334,7 @@ func (s *membershipService) AcceptInvitation(ctx context.Context, token string, 
 		s.logger.Error("Failed to mark invitation as accepted", "error", err, "invitation_id", invitation.ID)
 	}
 
-	s.auditService.LogAction(ctx, invitation.TenantID, domain.AuditActionMemberJoin, domain.AuditResourceMembership, userID.String(), domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, invitation.TenantID, domain.AuditActionMemberJoin, domain.AuditResourceMembership, userID.String(), domain.AuditStatusSuccess, map[string]interface{}{
 		"invitation_id": invitation.ID.String(),
 		"role":          string(invitation.Role),
 	})
@@ -357,7 +357,7 @@ func (s *membershipService) CancelInvitation(ctx context.Context, tenantID, acto
 
 	// Only admins and owners can cancel invitations
 	if !actorMembership.CanManageMembers() {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionInvitationCancel, domain.AuditResourceInvitation, invitationID.String(), domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionInvitationCancel, domain.AuditResourceInvitation, invitationID.String(), domain.AuditStatusFailure, map[string]interface{}{
 			"reason":   "permission_denied",
 			"actor_id": actorID.String(),
 		})
@@ -378,7 +378,7 @@ func (s *membershipService) CancelInvitation(ctx context.Context, tenantID, acto
 		return fmt.Errorf("failed to cancel invitation: %w", err)
 	}
 
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionInvitationCancel, domain.AuditResourceInvitation, invitationID.String(), domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionInvitationCancel, domain.AuditResourceInvitation, invitationID.String(), domain.AuditStatusSuccess, map[string]interface{}{
 		"actor_id": actorID.String(),
 		"email":    invitation.Email,
 	})

@@ -11,8 +11,8 @@ import (
 
 func TestConfig_Validate_MissingAccessTokenSecret(t *testing.T) {
 	// Clear environment variables
-	os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-	os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+	t.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "")
+	t.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "")
 
 	cfg := &Config{
 		JWT: JWTConfig{
@@ -31,8 +31,8 @@ func TestConfig_Validate_MissingAccessTokenSecret(t *testing.T) {
 
 func TestConfig_Validate_MissingRefreshTokenSecret(t *testing.T) {
 	// Clear environment variables
-	os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-	os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+	t.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "")
+	t.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "")
 
 	cfg := &Config{
 		JWT: JWTConfig{
@@ -82,8 +82,7 @@ func TestConfig_Validate_Success(t *testing.T) {
 
 func TestConfig_Validate_UsesEnvForAccessSecret(t *testing.T) {
 	// Set environment variable
-	os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "env-access-secret")
-	defer os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
+	t.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "env-access-secret")
 
 	cfg := &Config{
 		JWT: JWTConfig{
@@ -102,8 +101,7 @@ func TestConfig_Validate_UsesEnvForAccessSecret(t *testing.T) {
 
 func TestConfig_Validate_UsesEnvForRefreshSecret(t *testing.T) {
 	// Set environment variable
-	os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "env-refresh-secret")
-	defer os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+	t.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "env-refresh-secret")
 
 	cfg := &Config{
 		JWT: JWTConfig{
@@ -122,19 +120,11 @@ func TestConfig_Validate_UsesEnvForRefreshSecret(t *testing.T) {
 
 func TestLoad_WithEnvironmentVariables(t *testing.T) {
 	// Set required environment variables
-	os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
-	os.Setenv("AUTH_DATABASE_HOST", "testhost")
-	os.Setenv("AUTH_DATABASE_PORT", "5433")
-	os.Setenv("AUTH_SERVER_PORT", "9090")
-
-	defer func() {
-		os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-		os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
-		os.Unsetenv("AUTH_DATABASE_HOST")
-		os.Unsetenv("AUTH_DATABASE_PORT")
-		os.Unsetenv("AUTH_SERVER_PORT")
-	}()
+	t.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
+	t.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
+	t.Setenv("AUTH_DATABASE_HOST", "testhost")
+	t.Setenv("AUTH_DATABASE_PORT", "5433")
+	t.Setenv("AUTH_SERVER_PORT", "9090")
 
 	cfg, err := Load()
 	require.NoError(t, err)
@@ -155,34 +145,34 @@ func TestLoad_DefaultValues(t *testing.T) {
 	savedServerPort := os.Getenv("AUTH_SERVER_PORT")
 
 	// Clear env vars that would override defaults
-	os.Unsetenv("AUTH_JWT_ISSUER")
-	os.Unsetenv("AUTH_EMAIL_PROVIDER")
-	os.Unsetenv("AUTH_DATABASE_HOST")
-	os.Unsetenv("AUTH_DATABASE_PORT")
-	os.Unsetenv("AUTH_SERVER_PORT")
+	_ = os.Unsetenv("AUTH_JWT_ISSUER")
+	_ = os.Unsetenv("AUTH_EMAIL_PROVIDER")
+	_ = os.Unsetenv("AUTH_DATABASE_HOST")
+	_ = os.Unsetenv("AUTH_DATABASE_PORT")
+	_ = os.Unsetenv("AUTH_SERVER_PORT")
 
 	// Set only required environment variables
-	os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
+	_ = os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
+	_ = os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
 
 	defer func() {
-		os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-		os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
 		// Restore saved env vars
 		if savedIssuer != "" {
-			os.Setenv("AUTH_JWT_ISSUER", savedIssuer)
+			_ = os.Setenv("AUTH_JWT_ISSUER", savedIssuer)
 		}
 		if savedEmailProvider != "" {
-			os.Setenv("AUTH_EMAIL_PROVIDER", savedEmailProvider)
+			_ = os.Setenv("AUTH_EMAIL_PROVIDER", savedEmailProvider)
 		}
 		if savedDBHost != "" {
-			os.Setenv("AUTH_DATABASE_HOST", savedDBHost)
+			_ = os.Setenv("AUTH_DATABASE_HOST", savedDBHost)
 		}
 		if savedDBPort != "" {
-			os.Setenv("AUTH_DATABASE_PORT", savedDBPort)
+			_ = os.Setenv("AUTH_DATABASE_PORT", savedDBPort)
 		}
 		if savedServerPort != "" {
-			os.Setenv("AUTH_SERVER_PORT", savedServerPort)
+			_ = os.Setenv("AUTH_SERVER_PORT", savedServerPort)
 		}
 	}()
 
@@ -209,18 +199,18 @@ func TestLoad_DefaultValues(t *testing.T) {
 
 func TestLoad_CacheConfiguration(t *testing.T) {
 	// Set required environment variables plus cache config
-	os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
-	os.Setenv("AUTH_CACHE_TYPE", "redis")
-	os.Setenv("AUTH_CACHE_ENABLED", "true")
-	os.Setenv("AUTH_CACHE_REDIS_ADDRESS", "redis.example.com:6379")
+	_ = os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
+	_ = os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
+	_ = os.Setenv("AUTH_CACHE_TYPE", "redis")
+	_ = os.Setenv("AUTH_CACHE_ENABLED", "true")
+	_ = os.Setenv("AUTH_CACHE_REDIS_ADDRESS", "redis.example.com:6379")
 
 	defer func() {
-		os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-		os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
-		os.Unsetenv("AUTH_CACHE_TYPE")
-		os.Unsetenv("AUTH_CACHE_ENABLED")
-		os.Unsetenv("AUTH_CACHE_REDIS_ADDRESS")
+		_ = os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_CACHE_TYPE")
+		_ = os.Unsetenv("AUTH_CACHE_ENABLED")
+		_ = os.Unsetenv("AUTH_CACHE_REDIS_ADDRESS")
 	}()
 
 	cfg, err := Load()
@@ -233,18 +223,18 @@ func TestLoad_CacheConfiguration(t *testing.T) {
 
 func TestLoad_OAuthConfiguration(t *testing.T) {
 	// Set required environment variables plus OAuth config
-	os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
-	os.Setenv("AUTH_OAUTH_GOOGLE_CLIENT_ID", "google-client-id")
-	os.Setenv("AUTH_OAUTH_GOOGLE_CLIENT_SECRET", "google-client-secret")
-	os.Setenv("AUTH_OAUTH_GITHUB_CLIENT_ID", "github-client-id")
+	_ = os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
+	_ = os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
+	_ = os.Setenv("AUTH_OAUTH_GOOGLE_CLIENT_ID", "google-client-id")
+	_ = os.Setenv("AUTH_OAUTH_GOOGLE_CLIENT_SECRET", "google-client-secret")
+	_ = os.Setenv("AUTH_OAUTH_GITHUB_CLIENT_ID", "github-client-id")
 
 	defer func() {
-		os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-		os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
-		os.Unsetenv("AUTH_OAUTH_GOOGLE_CLIENT_ID")
-		os.Unsetenv("AUTH_OAUTH_GOOGLE_CLIENT_SECRET")
-		os.Unsetenv("AUTH_OAUTH_GITHUB_CLIENT_ID")
+		_ = os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_OAUTH_GOOGLE_CLIENT_ID")
+		_ = os.Unsetenv("AUTH_OAUTH_GOOGLE_CLIENT_SECRET")
+		_ = os.Unsetenv("AUTH_OAUTH_GITHUB_CLIENT_ID")
 	}()
 
 	cfg, err := Load()
@@ -262,18 +252,18 @@ func TestLoad_OAuthConfiguration(t *testing.T) {
 
 func TestLoad_EmailConfiguration(t *testing.T) {
 	// Set required environment variables plus email config
-	os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
-	os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
-	os.Setenv("AUTH_EMAIL_PROVIDER", "sendgrid")
-	os.Setenv("AUTH_EMAIL_API_KEY", "sendgrid-api-key")
-	os.Setenv("AUTH_EMAIL_FROM_EMAIL", "noreply@example.com")
+	_ = os.Setenv("AUTH_JWT_ACCESS_TOKEN_SECRET", "test-access-secret")
+	_ = os.Setenv("AUTH_JWT_REFRESH_TOKEN_SECRET", "test-refresh-secret")
+	_ = os.Setenv("AUTH_EMAIL_PROVIDER", "sendgrid")
+	_ = os.Setenv("AUTH_EMAIL_API_KEY", "sendgrid-api-key")
+	_ = os.Setenv("AUTH_EMAIL_FROM_EMAIL", "noreply@example.com")
 
 	defer func() {
-		os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-		os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
-		os.Unsetenv("AUTH_EMAIL_PROVIDER")
-		os.Unsetenv("AUTH_EMAIL_API_KEY")
-		os.Unsetenv("AUTH_EMAIL_FROM_EMAIL")
+		_ = os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+		_ = os.Unsetenv("AUTH_EMAIL_PROVIDER")
+		_ = os.Unsetenv("AUTH_EMAIL_API_KEY")
+		_ = os.Unsetenv("AUTH_EMAIL_FROM_EMAIL")
 	}()
 
 	cfg, err := Load()
@@ -286,8 +276,8 @@ func TestLoad_EmailConfiguration(t *testing.T) {
 
 func TestLoad_MissingRequiredConfig(t *testing.T) {
 	// Clear all environment variables
-	os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
-	os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
+	_ = os.Unsetenv("AUTH_JWT_ACCESS_TOKEN_SECRET")
+	_ = os.Unsetenv("AUTH_JWT_REFRESH_TOKEN_SECRET")
 
 	_, err := Load()
 	assert.Error(t, err)

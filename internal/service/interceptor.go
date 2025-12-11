@@ -10,6 +10,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// tokenContextKey is the context key for storing the auth token
+type tokenContextKey struct{}
+
 // Public methods that don't require authentication
 var publicMethods = map[string]bool{
 	"/auth.v1.AuthService/Register":                true,
@@ -79,7 +82,7 @@ func UnaryAuthInterceptor() grpc.UnaryServerInterceptor {
 		// You could inject the JWT service into the interceptor and validate it
 
 		// Add user info to context if needed
-		ctx = context.WithValue(ctx, "token", token)
+		ctx = context.WithValue(ctx, tokenContextKey{}, token)
 
 		return handler(ctx, req)
 	}

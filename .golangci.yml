@@ -1,51 +1,35 @@
+version: "2"
+
 run:
   timeout: 5m
 
 linters:
   enable:
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
     - unused
-    - gofmt
-    - goimports
     - misspell
     - unconvert
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/guipguia/auth
 
 linters-settings:
   errcheck:
     check-type-assertions: false
-    # Ignore errors from audit/logging functions - these are intentionally fire-and-forget
-    exclude-functions:
-      - (*github.com/guipguia/auth/internal/service.AuditService).LogAction
-      - (*github.com/guipguia/auth/internal/service.AuditService).LogUserAction
-      - (*github.com/guipguia/auth/internal/service.AuditService).LogSessionAction
-      - (*github.com/guipguia/auth/internal/service.auditService).LogAction
-      - (*github.com/guipguia/auth/internal/service.auditService).LogUserAction
-      - (*github.com/guipguia/auth/internal/service.auditService).LogSessionAction
-      - (github.com/guipguia/auth/internal/service.AuditService).LogAction
-      - (github.com/guipguia/auth/internal/service.AuditService).LogUserAction
-      - (github.com/guipguia/auth/internal/service.AuditService).LogSessionAction
-      - (*github.com/guipguia/auth/internal/service.LoginProtectionService).RecordLoginAttempt
-      - (*github.com/guipguia/auth/internal/service.loginProtectionService).RecordLoginAttempt
-      - (github.com/guipguia/auth/internal/service.LoginProtectionService).RecordLoginAttempt
-      - (*github.com/spf13/viper.Viper).BindEnv
-      - (*github.com/spf13/viper.Viper).SetDefault
-      - (github.com/guipguia/auth/internal/repository.SessionRepository).Revoke
   govet:
     enable-all: true
     disable:
       - fieldalignment
       - shadow
-  goimports:
-    local-prefixes: github.com/guipguia/auth
-  staticcheck:
-    checks:
-      - all
-      - -SA1029  # Allow string context keys for now
-      - -SA9003  # Allow empty branches
 
 issues:
   exclude-files:
@@ -64,7 +48,50 @@ issues:
     - path: internal/service/
       linters:
         - unparam
+    # Ignore audit/logging error returns (fire-and-forget pattern)
+    - linters:
+        - errcheck
+      text: "auditService"
+    - linters:
+        - errcheck
+      text: "LogAction"
+    - linters:
+        - errcheck
+      text: "LogUserAction"
+    - linters:
+        - errcheck
+      text: "LogSessionAction"
+    - linters:
+        - errcheck
+      text: "RecordLoginAttempt"
+    - linters:
+        - errcheck
+      text: "loginProtectionService"
+    # Ignore Close() in defer (common pattern)
+    - linters:
+        - errcheck
+      text: "defer.*Close"
+    # Ignore BindEnv (viper)
+    - linters:
+        - errcheck
+      text: "BindEnv"
+    # Ignore sessionRepo.Revoke (best-effort cleanup)
+    - linters:
+        - errcheck
+      text: "sessionRepo.Revoke"
     # Ignore ineffassign for message variable pattern
     - linters:
         - ineffassign
       text: "ineffectual assignment to message"
+    # Ignore SA1029 (string context keys) - will fix later
+    - linters:
+        - staticcheck
+      text: "SA1029"
+    # Ignore SA9003 (empty branches)
+    - linters:
+        - staticcheck
+      text: "SA9003"
+    # Ignore QF suggestions
+    - linters:
+        - staticcheck
+      text: "QF"

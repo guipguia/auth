@@ -169,7 +169,7 @@ func TestOTPRepository_GetByEmailAndType_ReturnsLatest(t *testing.T) {
 		ExpiresAt: time.Now().Add(1 * time.Hour),
 		Used:      false,
 	}
-	repo.Create(otp1)
+	_ = repo.Create(otp1)
 
 	time.Sleep(10 * time.Millisecond)
 
@@ -183,7 +183,7 @@ func TestOTPRepository_GetByEmailAndType_ReturnsLatest(t *testing.T) {
 		ExpiresAt: time.Now().Add(1 * time.Hour),
 		Used:      false,
 	}
-	repo.Create(otp2)
+	_ = repo.Create(otp2)
 
 	retrieved, err := repo.GetByEmailAndType(tenantID, "test@example.com", domain.OTPTypePasswordReset)
 
@@ -249,7 +249,7 @@ func TestOTPRepository_DeleteExpired(t *testing.T) {
 		ExpiresAt: time.Now().Add(-24 * time.Hour),
 		Used:      false,
 	}
-	repo.Create(expiredOTP)
+	_ = repo.Create(expiredOTP)
 
 	// Create valid OTP
 	validOTP := &domain.OTP{
@@ -261,7 +261,7 @@ func TestOTPRepository_DeleteExpired(t *testing.T) {
 		ExpiresAt: time.Now().Add(24 * time.Hour),
 		Used:      false,
 	}
-	repo.Create(validOTP)
+	_ = repo.Create(validOTP)
 
 	err := repo.DeleteExpired()
 
@@ -294,7 +294,7 @@ func TestOTPRepository_DeleteByUserAndType(t *testing.T) {
 		ExpiresAt: time.Now().Add(1 * time.Hour),
 		Used:      false,
 	}
-	repo.Create(otp1)
+	_ = repo.Create(otp1)
 
 	// Create OTP of different type (should not be deleted)
 	otp2 := &domain.OTP{
@@ -306,7 +306,7 @@ func TestOTPRepository_DeleteByUserAndType(t *testing.T) {
 		ExpiresAt: time.Now().Add(1 * time.Hour),
 		Used:      false,
 	}
-	repo.Create(otp2)
+	_ = repo.Create(otp2)
 
 	err := repo.DeleteByUserAndType(tenantID, userID, domain.OTPTypePasswordReset)
 

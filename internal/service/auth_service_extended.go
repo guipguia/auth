@@ -36,7 +36,7 @@ func (s *AuthService) GetOAuthURL(ctx context.Context, req *authv1.GetOAuthURLRe
 	}
 
 	// Audit log OAuth flow initiated
-	s.auditService.LogAction(ctx, tenantID, domain.AuditActionOAuthLogin, domain.AuditResourceUser, "", domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionOAuthLogin, domain.AuditResourceUser, "", domain.AuditStatusSuccess, map[string]interface{}{
 		"provider": string(provider),
 		"state":    state,
 	})
@@ -61,7 +61,7 @@ func (s *AuthService) OAuthCallback(ctx context.Context, req *authv1.OAuthCallba
 	// Exchange code for token
 	token, err := s.oauthService.ExchangeCode(provider, req.Code)
 	if err != nil {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionOAuthLogin, domain.AuditResourceUser, "", domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionOAuthLogin, domain.AuditResourceUser, "", domain.AuditStatusFailure, map[string]interface{}{
 			"provider": string(provider),
 			"reason":   "code_exchange_failed",
 		})
@@ -71,7 +71,7 @@ func (s *AuthService) OAuthCallback(ctx context.Context, req *authv1.OAuthCallba
 	// Get user info from provider
 	userInfo, err := s.oauthService.GetUserInfo(provider, token)
 	if err != nil {
-		s.auditService.LogAction(ctx, tenantID, domain.AuditActionOAuthLogin, domain.AuditResourceUser, "", domain.AuditStatusFailure, map[string]interface{}{
+		_ = s.auditService.LogAction(ctx, tenantID, domain.AuditActionOAuthLogin, domain.AuditResourceUser, "", domain.AuditStatusFailure, map[string]interface{}{
 			"provider": string(provider),
 			"reason":   "user_info_failed",
 		})
@@ -104,7 +104,7 @@ func (s *AuthService) OAuthCallback(ctx context.Context, req *authv1.OAuthCallba
 			isNewUser = true
 
 			// Audit log new user registration via OAuth
-			s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionRegister, domain.AuditStatusSuccess, map[string]interface{}{
+			_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionRegister, domain.AuditStatusSuccess, map[string]interface{}{
 				"method":   "oauth",
 				"provider": string(provider),
 			})
@@ -130,7 +130,7 @@ func (s *AuthService) OAuthCallback(ctx context.Context, req *authv1.OAuthCallba
 		}
 
 		// Audit log OAuth account linked
-		s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionOAuthLink, domain.AuditStatusSuccess, map[string]interface{}{
+		_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionOAuthLink, domain.AuditStatusSuccess, map[string]interface{}{
 			"provider": string(provider),
 		})
 	} else {
@@ -179,7 +179,7 @@ func (s *AuthService) OAuthCallback(ctx context.Context, req *authv1.OAuthCallba
 	}
 
 	// Audit log OAuth login
-	s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionOAuthLogin, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, user.ID, nil, domain.AuditActionOAuthLogin, domain.AuditStatusSuccess, map[string]interface{}{
 		"provider":   string(provider),
 		"session_id": session.ID.String(),
 		"is_new":     isNewUser,
@@ -242,7 +242,7 @@ func (s *AuthService) LinkOAuthAccount(ctx context.Context, req *authv1.LinkOAut
 	}
 
 	// Audit log OAuth account linked
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionOAuthLink, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionOAuthLink, domain.AuditStatusSuccess, map[string]interface{}{
 		"provider": string(provider),
 	})
 
@@ -278,7 +278,7 @@ func (s *AuthService) UnlinkOAuthAccount(ctx context.Context, req *authv1.Unlink
 	}
 
 	// Audit log OAuth account unlinked
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionOAuthUnlink, domain.AuditStatusSuccess, map[string]interface{}{
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionOAuthUnlink, domain.AuditStatusSuccess, map[string]interface{}{
 		"provider": string(provider),
 	})
 
@@ -332,7 +332,7 @@ func (s *AuthService) RevokeToken(ctx context.Context, req *authv1.RevokeTokenRe
 		}
 
 		// Audit log token revocation
-		s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRevoke, domain.AuditStatusSuccess, nil)
+		_ = s.auditService.LogSessionAction(ctx, tenantID, session.ID, session.UserID, domain.AuditActionTokenRevoke, domain.AuditStatusSuccess, nil)
 
 		return &authv1.RevokeTokenResponse{
 			Success: true,
@@ -414,7 +414,7 @@ func (s *AuthService) RevokeSession(ctx context.Context, req *authv1.RevokeSessi
 	}
 
 	// Audit log session revocation
-	s.auditService.LogSessionAction(ctx, tenantID, sessionID, session.UserID, domain.AuditActionSessionRevoke, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogSessionAction(ctx, tenantID, sessionID, session.UserID, domain.AuditActionSessionRevoke, domain.AuditStatusSuccess, nil)
 
 	return &authv1.RevokeSessionResponse{
 		Success: true,
@@ -482,7 +482,7 @@ func (s *AuthService) UpdateUserProfile(ctx context.Context, req *authv1.UpdateU
 	}
 
 	// Audit log profile update
-	s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionProfileUpdate, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, userID, nil, domain.AuditActionProfileUpdate, domain.AuditStatusSuccess, nil)
 
 	return &authv1.UpdateUserProfileResponse{
 		User: s.userToProto(user),
@@ -518,7 +518,7 @@ func (s *AuthService) VerifyEmail(ctx context.Context, req *authv1.VerifyEmailRe
 	}
 
 	// Audit log email verification
-	s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionEmailVerify, domain.AuditStatusSuccess, nil)
+	_ = s.auditService.LogUserAction(ctx, tenantID, otp.UserID, nil, domain.AuditActionEmailVerify, domain.AuditStatusSuccess, nil)
 
 	return &authv1.VerifyEmailResponse{
 		Success: true,

@@ -114,13 +114,14 @@ func (s *jwtService) ParseToken(tokenString string) (*Claims, error) {
 		}
 
 		// Return appropriate secret based on token type
-		if claims.Type == AccessToken {
+		switch claims.Type {
+		case AccessToken:
 			return []byte(s.cfg.AccessTokenSecret), nil
-		} else if claims.Type == RefreshToken {
+		case RefreshToken:
 			return []byte(s.cfg.RefreshTokenSecret), nil
+		default:
+			return nil, fmt.Errorf("unknown token type")
 		}
-
-		return nil, fmt.Errorf("unknown token type")
 	})
 
 	if err != nil {

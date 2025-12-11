@@ -40,6 +40,7 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           version: "28.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies and generate proto
         run: |
@@ -85,6 +86,7 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           version: "28.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate protobuf files
         run: |
@@ -114,6 +116,7 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           version: "28.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate protobuf files
         run: |

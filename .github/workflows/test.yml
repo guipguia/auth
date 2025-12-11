@@ -36,8 +36,16 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Install dependencies
-        run: go mod download
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          version: "28.x"
+
+      - name: Install dependencies and generate proto
+        run: |
+          go mod download
+          make install-tools
+          make proto
 
       - name: Run tests with coverage
         env:
@@ -73,6 +81,16 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          version: "28.x"
+
+      - name: Generate protobuf files
+        run: |
+          make install-tools
+          make proto
+
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
@@ -91,6 +109,16 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          version: "28.x"
+
+      - name: Generate protobuf files
+        run: |
+          make install-tools
+          make proto
 
       - name: Build
         run: make build

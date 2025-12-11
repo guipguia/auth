@@ -50,7 +50,7 @@ type AccountLockout struct {
 	UnlocksAt   time.Time  `gorm:"not null;index" json:"unlocks_at"`
 	LockReason  string     `gorm:"type:varchar(100);not null" json:"lock_reason"`
 	FailedCount int        `gorm:"not null" json:"failed_count"`
-	UnlockedAt  *time.Time `gorm:"index" json:"unlocked_at,omitempty"`   // Set when manually unlocked
+	UnlockedAt  *time.Time `gorm:"index" json:"unlocked_at,omitempty"`     // Set when manually unlocked
 	UnlockedBy  *uuid.UUID `gorm:"type:uuid" json:"unlocked_by,omitempty"` // Admin who unlocked
 	CreatedAt   time.Time  `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt   time.Time  `gorm:"autoUpdateTime" json:"updated_at"`
@@ -82,10 +82,10 @@ const (
 // IPRateLimit tracks rate limiting by IP address
 // Prevents distributed brute force attacks
 type IPRateLimit struct {
-	ID           uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	TenantID     uuid.UUID `gorm:"type:uuid;not null;index" json:"tenant_id"`
-	IPAddress    string    `gorm:"type:varchar(45);not null;index:idx_ip_rate_tenant_ip,unique" json:"ip_address"`
-	AttemptCount int       `gorm:"not null;default:0" json:"attempt_count"`
+	ID           uuid.UUID  `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	TenantID     uuid.UUID  `gorm:"type:uuid;not null;index" json:"tenant_id"`
+	IPAddress    string     `gorm:"type:varchar(45);not null;index:idx_ip_rate_tenant_ip,unique" json:"ip_address"`
+	AttemptCount int        `gorm:"not null;default:0" json:"attempt_count"`
 	BlockedUntil *time.Time `gorm:"index" json:"blocked_until,omitempty"`
 	FirstAttempt time.Time  `gorm:"not null" json:"first_attempt"`
 	LastAttempt  time.Time  `gorm:"not null" json:"last_attempt"`

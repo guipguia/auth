@@ -10,23 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// createTestTenantID creates a tenant directly in the database for testing
-// In production, tenants are managed by the tenant service
-func createTestTenantID(t *testing.T, db interface {
-	Exec(sql string, values ...interface{}) interface{ Error() error }
-}) uuid.UUID {
-	tenantID := uuid.New()
-	slug := "test-" + uuid.New().String()[:8]
-	err := db.Exec(`INSERT INTO tenants (id, name, slug, status, settings, created_at, updated_at)
-		VALUES (?, ?, ?, 'ACTIVE', '{}', NOW(), NOW())`,
-		tenantID, "Test Tenant", slug).Error()
-	if err != nil {
-		// Table might not exist, that's ok for unit tests - tenant validation is done by tenant service
-		return tenantID
-	}
-	return tenantID
-}
-
 func TestUserRepository_Create(t *testing.T) {
 	db := setupTestDB(t)
 	repo := NewUserRepository(db, nil)

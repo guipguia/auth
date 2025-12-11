@@ -396,10 +396,10 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("cache.redis.ttl_seconds", 300)
 
 	// Session defaults
-	v.SetDefault("session.session_expiry", 7*24*time.Hour)  // 7 days
-	v.SetDefault("session.idle_timeout", 15*time.Minute)    // 15 minutes (HIPAA)
-	v.SetDefault("session.max_concurrent_sessions", 5)      // 5 concurrent sessions
-	v.SetDefault("session.hipaa_compliant", false)          // Disabled by default
+	v.SetDefault("session.session_expiry", 7*24*time.Hour) // 7 days
+	v.SetDefault("session.idle_timeout", 15*time.Minute)   // 15 minutes (HIPAA)
+	v.SetDefault("session.max_concurrent_sessions", 5)     // 5 concurrent sessions
+	v.SetDefault("session.hipaa_compliant", false)         // Disabled by default
 
 	// Tenant service defaults
 	v.SetDefault("tenant.address", "tenant-service:8080")

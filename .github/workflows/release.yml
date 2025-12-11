@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
@@ -24,6 +25,17 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          version: "28.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate protobuf files
+        run: |
+          make install-tools
+          make proto
 
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6

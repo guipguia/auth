@@ -12,6 +12,28 @@ linters:
     - unused
     - misspell
     - unconvert
+  settings:
+    errcheck:
+      check-type-assertions: false
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+  exclusions:
+    generated: lax
+    rules:
+      # Exclude test files from errcheck
+      - path: _test\.go
+        linters:
+          - errcheck
+      # Exclude test files from govet unusedwrite
+      - path: _test\.go
+        linters:
+          - govet
+        text: "unusedwrite"
+    paths:
+      - ".*\\.pb\\.go$"
 
 formatters:
   enable:
@@ -21,77 +43,3 @@ formatters:
     goimports:
       local-prefixes:
         - github.com/guipguia/auth
-
-linters-settings:
-  errcheck:
-    check-type-assertions: false
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-      - shadow
-
-issues:
-  exclude-files:
-    - ".*\\.pb\\.go$"
-  exclude-rules:
-    # Ignore errcheck in tests
-    - path: _test\.go
-      linters:
-        - errcheck
-    # Ignore unused writes in tests (test setup)
-    - path: _test\.go
-      linters:
-        - govet
-      text: "unusedwrite"
-    # Ignore unparam in service layer (interface compliance)
-    - path: internal/service/
-      linters:
-        - unparam
-    # Ignore audit/logging error returns (fire-and-forget pattern)
-    - linters:
-        - errcheck
-      text: "auditService"
-    - linters:
-        - errcheck
-      text: "LogAction"
-    - linters:
-        - errcheck
-      text: "LogUserAction"
-    - linters:
-        - errcheck
-      text: "LogSessionAction"
-    - linters:
-        - errcheck
-      text: "RecordLoginAttempt"
-    - linters:
-        - errcheck
-      text: "loginProtectionService"
-    # Ignore Close() in defer (common pattern)
-    - linters:
-        - errcheck
-      text: "defer.*Close"
-    # Ignore BindEnv (viper)
-    - linters:
-        - errcheck
-      text: "BindEnv"
-    # Ignore sessionRepo.Revoke (best-effort cleanup)
-    - linters:
-        - errcheck
-      text: "sessionRepo.Revoke"
-    # Ignore ineffassign for message variable pattern
-    - linters:
-        - ineffassign
-      text: "ineffectual assignment to message"
-    # Ignore SA1029 (string context keys) - will fix later
-    - linters:
-        - staticcheck
-      text: "SA1029"
-    # Ignore SA9003 (empty branches)
-    - linters:
-        - staticcheck
-      text: "SA9003"
-    # Ignore QF suggestions
-    - linters:
-        - staticcheck
-      text: "QF"

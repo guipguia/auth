@@ -35,5 +35,4 @@ go.work.sum
 *.pb.go
 
 # Binary after compiling it
-/server
 /bin/

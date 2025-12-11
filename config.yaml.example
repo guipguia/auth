@@ -80,6 +80,22 @@ email:
   # For SendGrid or SES provider (use api_key)
   api_key: ""
 
+# Session Configuration
+session:
+  session_expiry: 168h          # Maximum session lifetime (7 days)
+  idle_timeout: 15m             # Idle timeout (15 min for HIPAA compliance)
+  max_concurrent_sessions: 5    # Max concurrent sessions per user (0 = unlimited)
+  hipaa_compliant: false        # Enable strict session security
+
+# Tenant Service Configuration (for multi-tenant setup)
+tenant:
+  address: "tenant-service:8080"  # Address of tenant service
+  timeout: 30s                    # Request timeout
+
+# Encryption key for sensitive data (OTP codes, etc.)
+# Generate with: openssl rand -base64 32
+encryption_key: ""
+
 # Cache Configuration (for stateless horizontal scaling)
 cache:
   # Options: none (stateless), memory (single instance only), redis (Valkey/Redis for horizontal scaling)

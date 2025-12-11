@@ -1,4 +1,4 @@
-.PHONY: proto clean build run test test-coverage test-race test-all test-internal coverage-report
+.PHONY: proto clean build run test test-coverage test-race test-all test-internal coverage-report lint lint-fix fmt
 
 # Ensure Go bin is in PATH
 GOPATH := $(shell go env GOPATH)
@@ -55,3 +55,18 @@ docker-build:
 install-tools:
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	go install golang.org/x/tools/cmd/goimports@latest
+	@which golangci-lint > /dev/null || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
+
+# Run linter
+lint:
+	golangci-lint run
+
+# Run linter and fix issues where possible
+lint-fix:
+	golangci-lint run --fix
+
+# Format code
+fmt:
+	gofmt -w .
+	goimports -local github.com/guipguia/auth -w ./internal/ ./cmd/

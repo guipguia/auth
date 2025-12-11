@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
+
 	"github.com/guipguia/auth/internal/crypto"
 	"github.com/guipguia/auth/internal/domain"
-	"gorm.io/gorm"
 )
 
 // cachedOTPRepository wraps OTPRepository with caching

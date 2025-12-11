@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/guipguia/auth/internal/config"
-	"github.com/guipguia/auth/internal/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/guipguia/auth/internal/config"
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // Database wraps the gorm.DB connection

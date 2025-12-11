@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
+
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // Helper function to create a test user with tenant

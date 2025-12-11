@@ -10,11 +10,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/guipguia/auth/internal/config"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
+
+	"github.com/guipguia/auth/internal/config"
 )
 
 // OAuthProvider represents an OAuth provider

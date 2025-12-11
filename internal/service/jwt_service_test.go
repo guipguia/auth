@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/config"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/guipguia/auth/internal/config"
 )
 
 func createTestJWTConfig() *config.JWTConfig {

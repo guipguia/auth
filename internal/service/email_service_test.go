@@ -3,8 +3,9 @@ package service
 import (
 	"testing"
 
-	"github.com/guipguia/auth/internal/config"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/guipguia/auth/internal/config"
 )
 
 func createTestEmailConfig() *config.EmailConfig {

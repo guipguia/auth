@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/guipguia/auth/internal/domain"
 	"github.com/guipguia/auth/internal/repository"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // PasswordHistoryConfig holds configuration for password history

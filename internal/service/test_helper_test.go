@@ -5,10 +5,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/domain"
-	"github.com/guipguia/auth/internal/repository"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
+
+	"github.com/guipguia/auth/internal/domain"
+	"github.com/guipguia/auth/internal/repository"
 )
 
 // MockUserRepository is a mock implementation of UserRepository

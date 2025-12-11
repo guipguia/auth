@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	authv1 "github.com/guipguia/auth/api/proto/auth/v1"
 	"github.com/guipguia/auth/internal/domain"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // GetOAuthURL generates an OAuth authorization URL

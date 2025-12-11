@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/domain"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // Test: NewOTPRepository

@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	authv1 "github.com/guipguia/auth/api/proto/auth/v1"
 	"github.com/guipguia/auth/internal/domain"
 	"github.com/guipguia/auth/internal/repository"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // TeamAuthService wraps AuthService to add team management functionality

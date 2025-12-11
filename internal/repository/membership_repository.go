@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/domain"
 	"gorm.io/gorm"
+
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // MembershipRepository handles database operations for tenant memberships and invitations

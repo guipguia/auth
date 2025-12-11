@@ -3,9 +3,10 @@ package service
 import (
 	"testing"
 
-	"github.com/guipguia/auth/internal/config"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
+
+	"github.com/guipguia/auth/internal/config"
 )
 
 // Test: NewOAuthService with Google config

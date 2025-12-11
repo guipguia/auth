@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
+
 	"github.com/guipguia/auth/internal/domain"
 	"github.com/guipguia/auth/internal/repository"
-	"gorm.io/gorm"
 )
 
 // LoginProtectionConfig holds configuration for login protection

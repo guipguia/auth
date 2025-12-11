@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/guipguia/auth/internal/config"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/guipguia/auth/internal/config"
 )
 
 // redisCache is a distributed cache implementation using Redis/Valkey

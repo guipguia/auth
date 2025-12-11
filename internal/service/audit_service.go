@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+
 	"github.com/guipguia/auth/internal/domain"
 	"github.com/guipguia/auth/internal/repository"
 )

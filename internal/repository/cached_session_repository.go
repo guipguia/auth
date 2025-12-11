@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/domain"
 	"gorm.io/gorm"
+
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // CacheService defines the interface for caching operations

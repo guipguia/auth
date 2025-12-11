@@ -5,11 +5,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/guipguia/auth/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/guipguia/auth/internal/domain"
 )
 
 func setupTestDB(t *testing.T) *gorm.DB {

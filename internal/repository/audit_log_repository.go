@@ -4,8 +4,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/guipguia/auth/internal/domain"
 	"gorm.io/gorm"
+
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // AuditLogRepository handles database operations for audit logs

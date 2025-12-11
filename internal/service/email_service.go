@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/smtp"
 
-	"github.com/guipguia/auth/internal/config"
-	"github.com/guipguia/auth/internal/domain"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
+
+	"github.com/guipguia/auth/internal/config"
+	"github.com/guipguia/auth/internal/domain"
 )
 
 // EmailService handles sending emails

@@ -58,7 +58,7 @@ auth/
 
 ## Prerequisites
 
-- Go 1.25.3 or higher
+- Go 1.24.0 or higher
 - PostgreSQL 12 or higher
 - Protocol Buffers compiler (protoc)
 
@@ -338,7 +338,7 @@ make clean
 Create a `Dockerfile`:
 
 ```dockerfile
-FROM golang:1.25-alpine AS builder
+FROM golang:1.24-alpine AS builder
 WORKDIR /app
 COPY . .
 RUN go build -o auth-server cmd/server/main.go

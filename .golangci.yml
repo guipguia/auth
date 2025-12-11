@@ -1,7 +1,5 @@
 run:
   timeout: 5m
-  skip-files:
-    - ".*\\.pb\\.go$"
 
 linters:
   enable:
@@ -50,6 +48,8 @@ linters-settings:
       - -SA9003  # Allow empty branches
 
 issues:
+  exclude-files:
+    - ".*\\.pb\\.go$"
   exclude-rules:
     # Ignore errcheck in tests
     - path: _test\.go

@@ -16,10 +16,10 @@ clean:
 	rm -f coverage.out coverage.html
 
 build:
-	go build -o bin/auth-server cmd/server/main.go
+	go build -o bin/auth-server ./cmd/server
 
 run:
-	go run cmd/server/main.go
+	go run ./cmd/server
 
 # Run all tests
 test:
